@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "bun --hot run server.js",
-    "prod": "bun run server.js"
+    "dev": "bun --hot run index.js",
+    "prod": "bun run index.js"
   },
   "keywords": [],
   "author": "",
