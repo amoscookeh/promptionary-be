@@ -69,7 +69,9 @@ export async function fetchProfilePhotoUrl(req, res) {
   try {
     const { userId } = req.params;
 
-    const { profile_picture_url: filePath } = await fetchUserDetails(userId);
+    const { profile_picture_url: filePath } = await UserModel.fetchUserDetails(
+      userId
+    );
     if (!filePath) {
       return res
         .status(404)

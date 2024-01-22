@@ -1,25 +1,24 @@
 import express from "express";
 import multer from "multer";
-import {
-  register,
-  login,
-  getUserDetails,
-  updateUserDetails,
-  uploadProfilePhoto,
-  fetchProfilePhotoUrl,
-} from "../controllers/userController.js";
+import * as UserController from "../controllers/userController.js";
 
 const router = express.Router();
 const upload = multer();
 
 // Auth
-router.post("/register", register);
-router.post("/login", login);
+router.post("/register", UserController.register);
+router.post("/login", UserController.login);
 
 // User profile
-router.get("/user/:userId", getUserDetails);
-router.put("/user/:userId", updateUserDetails);
-router.post("/upload-profile-photo", upload.single("file"), uploadProfilePhoto);
-router.get("/profile-picture/:userId", fetchProfilePhotoUrl);
+router.get("/user/:userId", UserController.getUserDetails);
+router.put("/user/:userId", UserController.updateUserDetails);
+
+// Profile photo
+router.post(
+  "/upload-profile-photo",
+  upload.single("file"),
+  UserController.uploadProfilePhoto
+);
+router.get("/profile-picture/:userId", UserController.fetchProfilePhotoUrl);
 
 export default router;
