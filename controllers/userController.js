@@ -1,12 +1,5 @@
 import bcrypt from "bcryptjs";
-import {
-  insertUser,
-  loginUser,
-  fetchUserDetails,
-  updateUser,
-  uploadProfilePicture,
-  fetchProfilePictureUrl,
-} from "../models/userModel.js";
+import * as UserModel from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 
 export async function register(req, res) {
@@ -14,7 +7,7 @@ export async function register(req, res) {
     const { username, password, email } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await insertUser({ username, hashedPassword, email });
+    await UserModel.insertUser({ username, hashedPassword, email });
 
     res.status(201).send({ message: "User registered successfully" });
   } catch (error) {
@@ -25,7 +18,7 @@ export async function register(req, res) {
 export async function login(req, res) {
   try {
     const { username, password } = req.body;
-    const user = await loginUser(username);
+    const user = await UserModel.loginUser(username);
 
     if (user && (await bcrypt.compare(password, user.password_hash))) {
       const token = jwt.sign({ userId: user.user_id }, process.env.JWT_SECRET, {
@@ -43,7 +36,7 @@ export async function login(req, res) {
 export async function getUserDetails(req, res) {
   try {
     const { userId } = req.params;
-    const user = await fetchUserDetails(userId);
+    const user = await UserModel.fetchUserDetails(userId);
     res.json(user);
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -61,9 +54,9 @@ export async function uploadProfilePhoto(req, res) {
 
   try {
     const filePath = `public/${user_id}/${currDT}_${file.originalname}`;
-    await uploadProfilePicture(filePath, file.buffer);
+    await UserModel.uploadProfilePicture(filePath, file.buffer);
 
-    await updateUser(user_id, { profilePictureUrl: filePath });
+    await UserModel.updateUser(user_id, { profilePictureUrl: filePath });
 
     res.json({ message: "File uploaded successfully", filePath });
   } catch (error) {
@@ -76,14 +69,16 @@ export async function fetchProfilePhotoUrl(req, res) {
   try {
     const { userId } = req.params;
 
-    const { profile_picture_url: filePath } = await fetchUserDetails(userId);
+    const { profile_picture_url: filePath } = await UserModel.fetchUserDetails(
+      userId
+    );
     if (!filePath) {
       return res
         .status(404)
         .send({ error: "User does not have a profile photo" });
     }
 
-    const publicURL = await fetchProfilePictureUrl(filePath);
+    const publicURL = await UserModel.fetchProfilePictureUrl(filePath);
 
     res.json(publicURL);
   } catch (error) {
@@ -95,7 +90,7 @@ export async function updateUserDetails(req, res) {
   try {
     const { userId } = req.params;
     const { username, email, profilePictureUrl } = req.body;
-    const updatedUser = await updateUser(userId, {
+    const updatedUser = await UserModel.updateUser(userId, {
       username,
       email,
       profilePictureUrl,
