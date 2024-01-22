@@ -1,4 +1,3 @@
-import { uploadProfilePhoto } from "../controllers/userController";
 import supabase from "../utils/supabaseClient";
 
 export async function insertUser({ username, hashedPassword, email }) {
