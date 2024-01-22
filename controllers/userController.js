@@ -28,7 +28,7 @@ export async function login(req, res) {
     const user = await loginUser(username);
 
     if (user && (await bcrypt.compare(password, user.password_hash))) {
-      const token = jwt.sign({ userId: user.user_id }, "your_jwt_secret", {
+      const token = jwt.sign({ userId: user.user_id }, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
       res.json({ token });
